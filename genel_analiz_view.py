@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from genel_analiz import *
+from genel_analiz import * #genel_analiz.py içerisindeki tüm fonksiyonlar dahil edildi.
 
 BG_MAIN = "#1f1f1f"
 BG_CARD = "#2b2b2b"
@@ -14,7 +14,7 @@ def sekme1_icerik(self):
         frame = ctk.CTkFrame(self.tabview.tab("Tümü"))
         frame.pack(fill="both", expand=True, padx=10, pady=10)
         
-        # 3 sütun x 4 satır grid yapısı
+        # 3 sütun x 4 satır grid yapısı oluşturur
         for i in range(4):  # 4 satır
             for j in range(3):  # 3 sütun
                 # Her hücre için frame
@@ -35,7 +35,7 @@ def sekme1_icerik(self):
 
                 frame.pack(fill="both",expand=True)
                 
-                # 1. satır, 1. sütun (0,0) - Toplam kayıt sayısı
+                # 1.Satır 1.Sütun (0,0) - Toplam kayıt sayısı
                 if i == 0 and j == 0:
                     kayit_sayisi = excel_kayit_sayisi()  # Excel dosyasından oku
                     label = ctk.CTkLabel(cell, 
@@ -43,7 +43,7 @@ def sekme1_icerik(self):
                                        font=ctk.CTkFont(size=14, weight="bold"))
                     label.pack(expand=True)
 
-                # 1. Satır 2. Sütun (0,1) - Ortalama Teslimat Süresi
+                # 1.Satır 2.Sütun (0,1) - Ortalama Teslimat Süresi
                 if i == 0 and j ==1:
                     ortalama_teslimat = ortalama_teslimat_suresi("Delivery Duration (min)")
                     strcolor = FG_TEXT
@@ -57,7 +57,7 @@ def sekme1_icerik(self):
                                          font=ctk.CTkFont(size=14, weight="bold"))
                     label.pack(expand=True)
 
-                #1. Satır 3. Sütun (0,2) - Gecikme Oranı
+                #1.Satır 3.Sütun (0,2) - Gecikme Oranı
                 if i == 0 and j ==2:
                     toplam_gecikme_orani = gecikme_orani("Is Delayed")
                     label = ctk.CTkLabel(cell,
@@ -65,7 +65,7 @@ def sekme1_icerik(self):
                                          font=ctk.CTkFont(size=14, weight="bold"))
                     label.pack(expand=True)
 
-                #2.Satır 1. Sütun (1,0) - En Çok Satış Yapan Restoran                
+                #2.Satır 1.Sütun (1,0) - En Çok Satış Yapan Restoran                
                 if i == 1 and j ==0:
                     cok_satan_restoran = en_cok_satan_restoran("Restaurant Name")
                     label = ctk.CTkLabel(cell,
@@ -74,7 +74,7 @@ def sekme1_icerik(self):
                                          font=ctk.CTkFont(size=14, weight="bold"))
                     label.pack(expand=True)
 
-                #2.Satır 2. Sütun (1,1) - En Çok Satış Yapan Şube                
+                #2.Satır 2.Sütun (1,1) - En Çok Satış Yapan Şube                
                 if i == 1 and j ==1:
                     cok_satan_sube = en_cok_satan_sube("Restaurant Name","Location")
                     label = ctk.CTkLabel(cell,
@@ -83,7 +83,55 @@ def sekme1_icerik(self):
                                          font=ctk.CTkFont(size=14, weight="bold"))
                     label.pack(expand=True) 
 
-                #2.Satır 3. Sütun (1,2) - Aylık Satış Grafiği
+                # 2.Satır 3.Sütun (1,2) - Gecikme Oranı En Düşük Restoran
+                if i == 1 and j == 2:
+                    gecikme_orani_en_dusuk = gecikme_orani_en_dusuk_restoran("Restaurant Name","Is Delayed")  
+                    
+                    label = ctk.CTkLabel(cell, 
+                                       text=f"Gecikme Oranı En Düşük Restoran\n{gecikme_orani_en_dusuk['restoran']}\n{gecikme_orani_en_dusuk['gecikme_orani']}%",
+                                       text_color = yesil, 
+                                       font=ctk.CTkFont(size=14, weight="bold"))
+                    label.pack(expand=True)
+
+                #3.Satır 1.Sütun (2,0) - Gecikme Oranı En Yüksek Restoran
+                if i == 2 and j == 0:
+                    gecikme_orani_en_yuksek = gecikme_orani_en_yuksek_restoran("Restaurant Name","Is Delayed")  
+                    label = ctk.CTkLabel(cell, 
+                                       text=f"Gecikme Oranı En Yüksek Restoran\n{gecikme_orani_en_yuksek['restoran']}\n{gecikme_orani_en_yuksek['gecikme_orani']}%", 
+                                       text_color = kirmizi,
+                                       font=ctk.CTkFont(size=14, weight="bold"))
+                    label.pack(expand=True)
+
+                #3. Satır 2.Sütun (2,1) - Tercih Edilen Ortalama Malzeme Sayısı
+                if i == 2 and j == 1:
+                    kayit_sayisi = ortalama_malzeme_sayisi() 
+                    label = ctk.CTkLabel(cell, 
+                                       text=f"Tercih Edilen Malzeme Sayısı Ortalama:\n\n{kayit_sayisi} Adet", 
+                                       font=ctk.CTkFont(size=14, weight="bold"))
+                    label.pack(expand=True)
+
+                #3.Satır 3. Sütun (3,3) - Pizza Boyut Grafiği                   
+                if i == 2 and j == 2: 
+                    veri = pizza_boyut_grafigi("Pizza Size")
+
+                    pizzalar = veri["Pizza Boyutlari"]
+                    satislar = veri["satislar"]
+
+                    # Matplotlib Figure
+                    fig, ax = plt.subplots(figsize=(4, 1), dpi=100)
+                    fig.patch.set_facecolor("#2b2b2b")  # Dark theme uyumu
+                    ax.set_facecolor("#2b2b2b")
+                    fig.subplots_adjust(top=0.80,bottom=0.20,left=0.10,right=0.95) #Yazıların taşmasını engellemek için boşluk bıraktık
+                    
+                    ax.pie(satislar,labels=pizzalar,autopct="%1.1f%%",startangle=90,pctdistance=0.6,labeldistance=1.2,textprops={"color":"white","fontsize":8})
+                    ax.set_title("Pizza Boyut Dağılımı",color="white")
+
+                    canvas = FigureCanvasTkAgg(fig, master=cell)
+                    canvas.draw()
+                    canvas.get_tk_widget().pack(fill="both", expand=True,padx=10,pady=15)
+                    plt.close(fig) #Tkinter döngüde kalıyor ve program kapanmıyordu, bu şekilde çözdük
+
+                #4.Satır 1.Sütun (3,0) - Aylık Satış Grafiği
                 if i == 3 and j == 0:
                     veri = aylik_satis_grafigi("Order Month")
 
@@ -92,84 +140,23 @@ def sekme1_icerik(self):
 
                     # Matplotlib Figure
                     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
-                    fig.patch.set_facecolor(BG_PLOT)  # Dark theme uyumu
+                    fig.patch.set_facecolor(BG_PLOT) 
                     ax.set_facecolor(BG_PLOT)
-                    fig.subplots_adjust(top=0.80,bottom=0.20,left=0.10,right=0.95) #Yazıların taşmasını engellemek için boşluk bıraktık
+                    fig.subplots_adjust(top=0.80,bottom=0.20,left=0.10,right=0.95) 
 
                     ax.plot(aylar, satislar, marker="o") #Çizgi Grafiği
                     ax.set_title("Aylık Satış Grafiği", color="white")
-                    #ax.set_xlabel("Ay", color="white")
                     ax.set_ylabel("Satış Adedi", color="white")
 
                     ax.tick_params(axis='x', colors='white', rotation=45)
                     ax.tick_params(axis='y', colors='white')
 
-                    # Grafiği CustomTkinter içine gömme
                     canvas = FigureCanvasTkAgg(fig, master=cell)
                     canvas.draw()
                     canvas.get_tk_widget().pack(fill="both", expand=True)
-                    plt.close(fig) #Tkinter döngüde kalıyor ve program kapanmıyordu, bu şekilde çözdük
+                    plt.close(fig) 
 
-                #Gecikme Oranı En Yüksek Restoran
-                # 3. satır, 1. sütun (2,0) -
-                if i == 2 and j == 0:
-                    gecikme_orani_en_yuksek = gecikme_orani_en_yuksek_restoran("Restaurant Name","Is Delayed")  # Excel dosyasından oku
-                    label = ctk.CTkLabel(cell, 
-                                       text=f"Gecikme Oranı En Yüksek Restoran\n{gecikme_orani_en_yuksek['restoran']}\n{gecikme_orani_en_yuksek['gecikme_orani']}%", 
-                                       text_color = kirmizi,
-                                       font=ctk.CTkFont(size=14, weight="bold"))
-                    label.pack(expand=True)
-
-                #Tercih Edilen Ortalama Malzeme Sayısı
-                #3. Satır 2. Sütun
-                if i == 2 and j == 1:
-                    kayit_sayisi = ortalama_malzeme_sayisi()  # Excel dosyasından oku
-                    label = ctk.CTkLabel(cell, 
-                                       text=f"Tercih Edilen Malzeme Sayısı Ortalama:\n\n{kayit_sayisi} Adet", 
-                                       font=ctk.CTkFont(size=14, weight="bold"))
-                    label.pack(expand=True)
-                #3.Satır 3. Sütun (1,2) - Pizza Tipi Grafiği                   
-                if i == 3 and j == 2: 
-                    veri = pizza_tipi_grafigi("Pizza Type")
-
-                    pizzalar = veri["Pizza Tipleri"]
-                    satislar = veri["satislar"]
-
-                    # Matplotlib Figure
-                    fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
-                    fig.patch.set_facecolor("#2b2b2b")  # Dark theme uyumu
-                    ax.set_facecolor("#2b2b2b")
-                    fig.subplots_adjust(top=0.80,bottom=0.20,left=0.10,right=0.95)
-
-                    ax.bar(pizzalar, satislar) #Sütun Grafiği 
-                    ax.set_title("Pizza Tipi Grafiği", color="white")
-                    #ax.set_xlabel("Pizza Tipi", color="white")
-                    ax.set_ylabel("Satış Adedi", color="white")
-
-                    ax.tick_params(axis='x', colors='white', rotation=45)
-                    ax.tick_params(axis='y', colors='white')
-
-                    # Grafiği CustomTkinter içine gömme
-                    canvas = FigureCanvasTkAgg(fig, master=cell)
-                    canvas.draw()
-                    canvas.get_tk_widget().pack(fill="both", expand=True,padx=10,pady=15)
-                    plt.close(fig)
-
-                #Gecikme Oranı En Düşük Restoran
-                #4. Satır 1. Sütun (3,0)
-                #Gecikme Oranı En Yüksek Restoran
-                # 3. satır, 1. sütun (2,0) -
-                if i == 1 and j == 2:
-                    gecikme_orani_en_dusuk = gecikme_orani_en_dusuk_restoran("Restaurant Name","Is Delayed")  # Excel dosyasından oku
-                    
-                    label = ctk.CTkLabel(cell, 
-                                       text=f"Gecikme Oranı En Düşük Restoran\n{gecikme_orani_en_dusuk['restoran']}\n{gecikme_orani_en_dusuk['gecikme_orani']}%",
-                                       text_color = yesil, 
-                                       font=ctk.CTkFont(size=14, weight="bold"))
-                    label.pack(expand=True)
-
-                #4.Satır 2.Sütun
-                #Saatlik Yoğunluk
+                #4.Satır 2.Sütun (3,1) - Saatlik Satış Yoğunluğu Grafiği
                 if i == 3 and j ==1:
                     veriler=saatlik_satis_grafigi()
 
@@ -192,22 +179,25 @@ def sekme1_icerik(self):
 
                     plt.close(fig)
 
-                #4.Satır 3. Sütun (3,2) - Pizza Boyut Grafiği                   
-                if i == 2 and j == 2: 
-                    veri = pizza_boyut_grafigi("Pizza Size")
+                #4.Satır 3.Sütun (4,3) - Pizza Tipi Grafiği                   
+                if i == 3 and j == 2: 
+                    veri = pizza_tipi_grafigi("Pizza Type")
 
-                    pizzalar = veri["Pizza Boyutlari"]
+                    pizzalar = veri["Pizza Tipleri"]
                     satislar = veri["satislar"]
 
-                    # Matplotlib Figure
-                    fig, ax = plt.subplots(figsize=(4, 1), dpi=100)
-                    fig.patch.set_facecolor("#2b2b2b")  # Dark theme uyumu
+                    fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
+                    fig.patch.set_facecolor("#2b2b2b")
                     ax.set_facecolor("#2b2b2b")
                     fig.subplots_adjust(top=0.80,bottom=0.20,left=0.10,right=0.95)
-                    
-                    ax.pie(satislar,labels=pizzalar,autopct="%1.1f%%",startangle=90,pctdistance=0.6,labeldistance=1.2,textprops={"color":"white","fontsize":8})
-                    ax.set_title("Pizza Boyut Dağılımı",color="white")
-                    # Grafiği CustomTkinter içine gömme
+
+                    ax.bar(pizzalar, satislar) #Sütun Grafiği 
+                    ax.set_title("Pizza Tipi Grafiği", color="white")
+                    ax.set_ylabel("Satış Adedi", color="white")
+
+                    ax.tick_params(axis='x', colors='white', rotation=45)
+                    ax.tick_params(axis='y', colors='white')
+
                     canvas = FigureCanvasTkAgg(fig, master=cell)
                     canvas.draw()
                     canvas.get_tk_widget().pack(fill="both", expand=True,padx=10,pady=15)
