@@ -4,29 +4,28 @@ import os
 # Excel dosya yolu
 EXCEL_DOSYASI = "veriler.xlsx"
 
+#Excel dosyasını okur, df adında veri çerçevesine tabloyu tanımlar ve df değerini döndürür.
 def excel_oku():
-    """Excel dosyasını oku, DataFrame döndür"""
     try:
-        if os.path.exists(EXCEL_DOSYASI):
-            return pd.read_excel(EXCEL_DOSYASI)
+        if os.path.exists(EXCEL_DOSYASI): #dosyanın varlığınu kontrol eder.
+            return pd.read_excel(EXCEL_DOSYASI) #pandas kütüphanesi kullanılarak excel dosyası okundu ve veri çerçevesi döndürdü.
         return pd.DataFrame()  # Boş DataFrame
     except Exception as e:
         print(f"Hata: {e}")
         return pd.DataFrame()
 
-#Toplam Kayıt
+#Veri çerçevesindeki toplam kayıt sayısını bulur. 
 def excel_kayit_sayisi():
-    """Excel'deki toplam kayıt sayısını döndür"""
     df = excel_oku()  # Excel'i oku
     return len(df)    # Kayıt sayısını al
 
-#Ortalama Teslimat Süresi
+#Veri çerçevesindeki "Delivery Duration (min)" sütunundaki değerlerin ortalamasını alır. 
 def ortalama_teslimat_suresi(teslimat_suresi = "Delivery Duration (min)"):
     df = excel_oku()
     ortalama_teslimat = df[teslimat_suresi].mean()
     return round(ortalama_teslimat,2)
 
-#Gecikme Oranı (30 Dakika teslimat süresini aşanlar)
+#Veri çerçevesinde "Is Delayed" sütunundaki True değerlerinin toplam değer sayısına oranını bulur.
 def gecikme_orani(gecikenler = "Is Delayed",deger=True):
     df = excel_oku()
     toplam = len(df)
@@ -34,27 +33,26 @@ def gecikme_orani(gecikenler = "Is Delayed",deger=True):
     geciken_yuzde = (geciken_toplam/toplam) * 100
     return round(geciken_yuzde,2)
 
-#En Çok Satış Yapan Restoran
+#Veri çerçevesinde "Restaurant Name" sütununda en çok tekrar eden değeri bulur.
 def en_cok_satan_restoran(restoran="Restaurant Name"):
     df = excel_oku()
-    en_cok_satan = df[restoran].mode()[0]
+    en_cok_satan = df[restoran].mode()[0] #mode() en sık tekar eden değeri(mod) bulur.
     return en_cok_satan
 
-#En Çok Satış Yapan Şube
+#Veri çerçevesindeki "Restaurant Name" ve "Location" sütunlarında gruplama ve sayım yaparak en yüksek değeri bulur
 def en_cok_satan_sube(restoran="Restaurant Name",lokasyon = "Location"):
     df = excel_oku()
-    yuksek_satis = df.groupby([restoran,lokasyon]).size().reset_index(name="satis_sayisi")
-    max_satis = yuksek_satis['satis_sayisi'].max()
-    en_yuksek_satis_sube = yuksek_satis[yuksek_satis['satis_sayisi']==max_satis].iloc[0]
+    yuksek_satis = df.groupby([restoran,lokasyon]).size().reset_index(name="satis_sayisi") #Lokasyon sütunundaki değerleri gruplar, size() ile veri sayısını alır, reset_index() ile sonucu veri çerçevesine dönüştürür.
+    max_satis = yuksek_satis['satis_sayisi'].max() #max() en yüksek değeri bulur.
+    en_yuksek_satis_sube = yuksek_satis[yuksek_satis['satis_sayisi']==max_satis].iloc[0] #En yüksek değere sahip "Location" değerini filtreler.
 
-    sonuc = en_yuksek_satis_sube.iloc[0]
     return {
         'Restaurant Name':en_yuksek_satis_sube["Restaurant Name"],
         'Location':en_yuksek_satis_sube["Location"],
         'satis_sayisi':int(en_yuksek_satis_sube['satis_sayisi'])
     }
 
-#Aylık Satış Grafiği
+#Veri çerçevesindeki "Order Month" sütununda gruplama, sıralama ve filtreleme işlemleri yapar ve değerleri listeler 
 def aylik_satis_grafigi(month = "Order Month"):
     df = excel_oku()
     ay_sirasi = {
@@ -73,20 +71,21 @@ def aylik_satis_grafigi(month = "Order Month"):
     }
 
     aylik_satis = (df[month].value_counts().rename_axis("Ay").reset_index(name="Satis"))
-    aylik_satis["Sira"]=aylik_satis["Ay"].map(ay_sirasi)
-    aylik_satis = aylik_satis.sort_values("Sira")
+    #value_counts() verinin tekrar sayısını bulur. rename_axis() eksen ismini değiştirir. 
+    aylik_satis["Sira"]=aylik_satis["Ay"].map(ay_sirasi) #map() sıralama işlemi yapar.
+    aylik_satis = aylik_satis.sort_values("Sira") #sort_values() değerlere göre sıralama yapar.
 
     return {
-        'aylar': aylik_satis["Ay"].tolist(),
+        'aylar': aylik_satis["Ay"].tolist(), #tolist() değerleri listeye çevirir.
         'satislar':aylik_satis["Satis"].tolist(),
-        'toplam':aylik_satis.sum()
+        'toplam':aylik_satis.sum() #sum() toplama işlemi yapar.
     }
 
-#Tercih Edilen Malzeme Sayısı (Ortalama)
+#Veri çerçevesindeki "Toppings Count" sütunundaki değerlerin ortalamasını alır.
 def ortalama_malzeme_sayisi(malzeme_sayisi = "Toppings Count"):
     df = excel_oku()
     ortalama_malzeme_sayisi = df[malzeme_sayisi].mean()
-    if ortalama_malzeme_sayisi < 1.5:
+    if ortalama_malzeme_sayisi < 1.5: #Sonuç değerini filtrelemek için koşul işlemi uygulandı.
         ortalama_malzeme_sayisi=1
     elif ortalama_malzeme_sayisi >= 1.5 and ortalama_malzeme_sayisi <=2.5:
         ortalama_malzeme_sayisi = 2
@@ -96,37 +95,37 @@ def ortalama_malzeme_sayisi(malzeme_sayisi = "Toppings Count"):
         ortalama_malzeme_sayisi = 4
     else:
         ortalama_malzeme_sayisi = 5
-    return round(ortalama_malzeme_sayisi)
+    return round(ortalama_malzeme_sayisi) #round() sayı değerinde yuvarlama işlemi yapar.
 
-#Gecikme Oranı En Fazla Restoran
+#Veri çerçevesindeki "Restaurant Name" ve "Is Delayed" sütunlarında gruplama ve sıralama işlemi yaparak en yüksek değeri bulur.
 def gecikme_orani_en_yuksek_restoran(restoran="Restaurant Name",gecikme="Is Delayed"):
     df = excel_oku()
 
     gecikme_orani = (df.groupby(restoran)[gecikme].mean().mul(100).round(2))
 
-    en_cok_geciken_restoran = gecikme_orani.idxmax()
-    en_cok_geciken_oran = gecikme_orani.max()
+    en_cok_geciken_restoran = gecikme_orani.idxmax() #idxmax() maksimum değerin konumunu bulur.
+    en_cok_geciken_oran = gecikme_orani.max() #max() en yüksek değeri bulur.
 
     return{
         "restoran":en_cok_geciken_restoran,
         "gecikme_orani":float(en_cok_geciken_oran)
     }
 
-#Gecikme Oranı En Az Restoran
+#Veri çerçevesindeki "Restaurant Name" ve "Is Delayed" sütunlarında gruplama ve sıralama işlemi yaparak en düşük değeri bulur.
 def gecikme_orani_en_dusuk_restoran(restoran="Restaurant Name",gecikme="Is Delayed"):
     df = excel_oku()
 
-    gecikme_orani = (df.groupby(restoran)[gecikme].mean().mul(100).round(2))
+    gecikme_orani = (df.groupby(restoran)[gecikme].mean().mul(100).round(2)) #mul() çarpma işlemi yapar.
 
-    en_az_geciken_restoran = gecikme_orani.idxmin()
-    en_az_geciken_oran = gecikme_orani.min()
+    en_az_geciken_restoran = gecikme_orani.idxmin() #idxmin() minimum değerin konumunu bulur.
+    en_az_geciken_oran = gecikme_orani.min() #min() endüşük değeri bulur.
 
     return{
         "restoran":en_az_geciken_restoran,
         "gecikme_orani":float(en_az_geciken_oran)
     }
 
-#Pizza Tipi Dağılımı
+#Veri çerçevesindeki "Pizza Type" sütununda işlemler yapar ve değerleri listeler
 def pizza_tipi_grafigi(pizza_type="Pizza Type"):
     df = excel_oku()
     pizza_tipleri = {
@@ -154,7 +153,7 @@ def pizza_tipi_grafigi(pizza_type="Pizza Type"):
     }
 
 
-#Gün İçinde En Yoğun Saatler
+#Veri çerçevesindeki "Order Hour" sütununda işlemler yapar ve değerleri listeler
 def saatlik_satis_grafigi(siparis_saati = "Order Hour"):
     df = excel_oku()
     yogunluk = df[siparis_saati].value_counts().rename_axis("Saat").reset_index(name="Siparis Sayisi").sort_values("Saat")
@@ -163,7 +162,7 @@ def saatlik_satis_grafigi(siparis_saati = "Order Hour"):
         "Siparisler": yogunluk["Siparis Sayisi"].tolist()
     }
 
-#Pizza Boyutlarının Pasta Dağılım Grafiği
+#Veri çerçevesindeki "Pizza Size" sütununda işlemler yapar ve değerleri listeler
 def pizza_boyut_grafigi(pizza_size="Pizza Size"):
     df = excel_oku()
     pizza_sizes = {
