@@ -1,6 +1,6 @@
-import customtkinter as ctk
-from genel_analiz_view import *
-from restoran_view import *
+import customtkinter as ctk #customtkinter kütüphanesi ctk olarak dahil edildi.
+from genel_analiz_view import * #genel_analiz_view dosyasındaki fonksiyonların tümü dahil edildi.
+from restoran_view import * #restoran_view dosyasındaki fonksiyonların tümü dahil edildi.
 
 BG_MAIN = "#1f1f1f"
 BG_CARD = "#2b2b2b"
@@ -26,7 +26,6 @@ class Uygulama(ctk.CTk):
         
         # Sekmeleri ekle
         for i in range(1, 7):
-            #self.tabview.add(f"Sekme {i}")
             match i:
                 case 1:
                     self.tabview.add("Tümü")
@@ -46,17 +45,6 @@ class Uygulama(ctk.CTk):
                 case 6:
                     self.tabview.add("Pizza Hut")
                     restoran_icerik(self,restoran_ad="Pizza Hut")
-        
-        # 1. sekmeyi doldur
-        
-        
-           
-         
-             
-                  
-
-    
-
     
 if __name__ == "__main__":
     app = Uygulama()
